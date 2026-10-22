@@ -1,0 +1,10 @@
+---
+wp_db_name: word
+wp_db_user: yhlee
+wp_db_password: 'It12345!'
+wp_db_host: 10.0.0.24
+
+dns_zone: yhlee.local
+dns_forwarders:
+  - 168.126.63.1
+  - 8.8.8.8

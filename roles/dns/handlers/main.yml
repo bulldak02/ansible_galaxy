@@ -1,0 +1,5 @@
+---
+- name: restart named
+  ansible.builtin.service:
+    name: "{{ dns_service }}"
+    state: restarted

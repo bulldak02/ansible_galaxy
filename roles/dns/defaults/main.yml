@@ -1,0 +1,18 @@
+---
+dns_zone: yhlee.local
+dns_serial: 2026102201
+dns_packages:
+  - bind
+  - bind-utils
+dns_service: named
+dns_forwarders:
+  - 8.8.8.8
+  - 1.1.1.1
+dns_records:
+  - { name: "@", type: A, value: "{{ groups['was'][0] }}" }
+  - { name: "ns", type: A, value: "{{ groups['was'][0] }}" }
+  - { name: "www", type: A, value: "{{ groups['was'][0] }}" }
+  - { name: "web", type: A, value: "{{ groups['web'][0] }}" }
+  - { name: "web1", type: A, value: "{{ groups['web1'][0] }}" }
+  - { name: "was", type: A, value: "{{ groups['was'][0] }}" }
+  - { name: "db", type: A, value: "{{ groups['db'][0] }}" }

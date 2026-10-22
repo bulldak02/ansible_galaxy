@@ -1,0 +1,5 @@
+---
+wp_version: 7.1.3
+wp_lang: ko_KR
+wp_archive: "wordpress-{{ wp_version }}-{{ wp_lang }}.tar.gz"
+wp_docroot: /var/www/html

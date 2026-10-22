@@ -1,0 +1,39 @@
+---
+- name: ensure document root exists
+  ansible.builtin.file:
+    path: "{{ wp_docroot }}"
+    state: directory
+    mode: "0755"
+
+- name: copy wordpress archive
+  ansible.builtin.copy:
+    src: "{{ wp_archive }}"
+    dest: "/tmp/{{ wp_archive }}"
+    mode: "0644"
+
+- name: extract wordpress
+  ansible.builtin.command:
+    cmd: "tar xzf /tmp/{{ wp_archive }} -C {{ wp_docroot }} --strip-components=1"
+    creates: "{{ wp_docroot }}/wp-config-sample.php"
+
+- name: create wp-config.php
+  ansible.builtin.copy:
+    src: "{{ wp_docroot }}/wp-config-sample.php"
+    dest: "{{ wp_docroot }}/wp-config.php"
+    remote_src: true
+    force: false
+
+- name: configure database settings
+  ansible.builtin.replace:
+    path: "{{ wp_docroot }}/wp-config.php"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - regexp: database_name_here
+      replace: "{{ wp_db_name }}"
+    - regexp: username_here
+      replace: "{{ wp_db_user }}"
+    - regexp: password_here
+      replace: "{{ wp_db_password }}"
+    - regexp: localhost
+      replace: "{{ wp_db_host }}"

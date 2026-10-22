@@ -1,0 +1,4 @@
+---
+haproxy_port: 80
+haproxy_balance: roundrobin
+haproxy_backends: "{{ groups['http'] }}"

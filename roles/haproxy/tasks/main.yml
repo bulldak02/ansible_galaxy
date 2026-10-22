@@ -1,0 +1,28 @@
+---
+- name: install haproxy
+  ansible.builtin.dnf:
+    name: haproxy
+    state: latest
+
+- name: configure haproxy
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: "0644"
+    validate: haproxy -c -f %s
+  notify: restart haproxy
+
+- name: open http port
+  ansible.posix.firewalld:
+    port: "{{ haproxy_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: haproxy service started
+  ansible.builtin.service:
+    name: haproxy
+    enabled: true
+    state: started

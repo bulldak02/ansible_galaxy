@@ -1,0 +1,36 @@
+options {
+    listen-on port 53 { any; };
+    listen-on-v6 port 53 { none; };
+    directory "/var/named";
+    dump-file "/var/named/data/cache_dump.db";
+    statistics-file "/var/named/data/named_stats.txt";
+    memstatistics-file "/var/named/data/named_mem_stats.txt";
+    recursing-file "/var/named/data/named.recursing";
+    secroots-file "/var/named/data/named.secroots";
+    allow-query { any; };
+    recursion yes;
+    forwarders { {{ dns_forwarders | join('; ') }}; };
+    dnssec-validation no;
+    pid-file "/run/named/named.pid";
+    session-keyfile "/run/named/session.key";
+};
+
+logging {
+    channel default_debug {
+        file "data/named.run";
+        severity dynamic;
+    };
+};
+
+zone "." IN {
+    type hint;
+    file "named.ca";
+};
+
+zone "{{ dns_zone }}" IN {
+    type master;
+    file "{{ dns_zone }}.zone";
+    allow-update { none; };
+};
+
+include "/etc/named.rfc1912.zones";

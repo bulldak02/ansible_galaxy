@@ -1,0 +1,168 @@
+---
+- name: remove rocky web server
+  hosts: web
+  ignore_errors: true
+
+  tasks:
+    - name: stop httpd
+      ansible.builtin.service:
+        name: httpd
+        enabled: false
+        state: stopped
+      failed_when: false
+
+    - name: close http port
+      ansible.posix.firewalld:
+        port: 80/tcp
+        permanent: true
+        state: disabled
+        immediate: true
+
+    - name: remove httpd and php packages
+      ansible.builtin.dnf:
+        name:
+          - httpd
+          - php
+          - php-mysqlnd
+          - php-gd
+        state: absent
+        autoremove: true
+
+    - name: remove web contents
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /var/www/
+        - /etc/httpd/
+        - /tmp/wordpress-7.1.3-ko_KR.tar.gz
+
+- name: remove ubuntu web server
+  hosts: web1
+  ignore_errors: true
+  vars:
+    dns_servers:
+      - 168.126.63.1
+      - 8.8.8.8
+    dns_search_domains: []
+
+  roles:
+    - dnsclient
+
+  tasks:
+    - name: stop apache2
+      ansible.builtin.service:
+        name: apache2
+        enabled: false
+        state: stopped
+      failed_when: false
+
+    - name: remove apache2 and php packages
+      ansible.builtin.apt:
+        name:
+          - apache2
+          - php
+          - php-mysql
+          - php-gd
+          - libapache2-mod-php
+        state: absent
+        autoremove: true
+
+    - name: remove web contents
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /var/www/
+        - /etc/apache2/
+        - /tmp/wordpress-7.1.3-ko_KR.tar.gz
+
+- name: remove load balancer
+  hosts: was
+  ignore_errors: true
+
+  tasks:
+    - name: stop haproxy
+      ansible.builtin.service:
+        name: haproxy
+        enabled: false
+        state: stopped
+      failed_when: false
+
+    - name: close http port
+      ansible.posix.firewalld:
+        port: 80/tcp
+        permanent: true
+        state: disabled
+        immediate: true
+
+    - name: remove haproxy package
+      ansible.builtin.dnf:
+        name: haproxy
+        state: absent
+        autoremove: true
+
+    - name: remove haproxy config
+      ansible.builtin.file:
+        path: /etc/haproxy/
+        state: absent
+
+    - name: stop named
+      ansible.builtin.service:
+        name: named
+        enabled: false
+        state: stopped
+      failed_when: false
+
+    - name: close dns ports
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        permanent: true
+        state: disabled
+        immediate: true
+      loop:
+        - 53/tcp
+        - 53/udp
+
+    - name: remove bind packages
+      ansible.builtin.dnf:
+        name:
+          - bind
+          - bind-utils
+        state: absent
+        autoremove: true
+
+    - name: remove dns config
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/named.conf
+        - /var/named/{{ dns_zone }}.zone
+
+- name: remove database server
+  hosts: db
+  ignore_errors: true
+
+  tasks:
+    - name: stop mysqld
+      ansible.builtin.service:
+        name: mysqld
+        enabled: false
+        state: stopped
+      failed_when: false
+
+    - name: close mysql port
+      ansible.posix.firewalld:
+        port: 3306/tcp
+        permanent: true
+        state: disabled
+        immediate: true
+
+    - name: remove mysql packages
+      ansible.builtin.dnf:
+        name:
+          - mysql-server
+          - python3-PyMySQL
+        state: absent
+        autoremove: true

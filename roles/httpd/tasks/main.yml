@@ -1,0 +1,33 @@
+---
+- name: install httpd and php packages
+  ansible.builtin.dnf:
+    name: "{{ httpd_packages }}"
+    state: latest
+
+- name: copy index.html
+  ansible.builtin.copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: apache
+    group: apache
+    mode: "0644"
+
+- name: serve index.php before index.html
+  ansible.builtin.lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^\s*DirectoryIndex'
+    line: "    DirectoryIndex index.php index.html"
+  notify: restart httpd
+
+- name: open http port
+  ansible.posix.firewalld:
+    port: "{{ httpd_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: httpd service started
+  ansible.builtin.service:
+    name: "{{ httpd_service }}"
+    enabled: true
+    state: started

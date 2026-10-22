@@ -1,0 +1,7 @@
+---
+dns_servers:
+  - 10.0.0.23
+  - 168.126.63.1
+dns_search_domains:
+  - "~."
+netplan_file: /etc/netplan/50-cloud-init.yaml

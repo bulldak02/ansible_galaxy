@@ -1,0 +1,35 @@
+---
+# tasks file for apache
+- name: print des
+  debug:
+    msg: install httpd
+
+- name: install "{{ http }}"
+  dnf:
+    name: "{{ http }}"
+    state: latest
+  notify:
+    - started httpd
+
+- name: copy index.html
+  copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: apache
+    group: apache
+
+- name: template copy
+  template:
+    src: httpd.j2
+    dest: /etc/httpd/conf/httpd.conf
+    owner: apache
+    group: apache
+  notify:
+    - restarted httpd
+
+- name: firewall
+  ansible.posix.firewalld:
+    port: 80/tcp
+    permanent: true
+    state: enabled
+    immediate: true

@@ -1,0 +1,9 @@
+---
+httpd_packages:
+  - httpd
+  - php
+  - php-mysqlnd
+  - php-gd
+  - tar
+httpd_service: httpd
+httpd_port: 80

@@ -1,0 +1,20 @@
+network:
+  version: 2
+  ethernets:
+    {{ ansible_facts.default_ipv4.interface }}:
+      addresses:
+      - "{{ ansible_facts.default_ipv4.address }}/{{ ansible_facts.default_ipv4.prefix }}"
+      nameservers:
+        addresses:
+{% for s in dns_servers %}
+        - {{ s }}
+{% endfor %}
+{% if dns_search_domains %}
+        search:
+{% for d in dns_search_domains %}
+        - "{{ d }}"
+{% endfor %}
+{% endif %}
+      routes:
+      - to: "default"
+        via: "{{ ansible_facts.default_ipv4.gateway }}"

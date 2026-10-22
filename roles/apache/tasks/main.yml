@@ -1,0 +1,32 @@
+---
+- name: update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: install apache2 and php packages
+  ansible.builtin.apt:
+    name: "{{ apache_packages }}"
+    state: latest
+
+- name: copy index.html
+  ansible.builtin.copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: www-data
+    group: www-data
+    mode: "0644"
+
+- name: serve index.php before index.html
+  ansible.builtin.copy:
+    dest: /etc/apache2/conf-enabled/wordpress.conf
+    content: |
+      DirectoryIndex index.php index.html
+    mode: "0644"
+  notify: reload apache2
+
+- name: apache2 service started
+  ansible.builtin.service:
+    name: "{{ apache_service }}"
+    enabled: true
+    state: started

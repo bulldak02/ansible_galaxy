@@ -1,0 +1,5 @@
+---
+- name: install "{{ http }}" & index.html file copy
+  hosts: web
+  roles:
+    - apache

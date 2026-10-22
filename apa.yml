@@ -1,0 +1,24 @@
+---
+- name: database server install (mysql)
+  hosts: db
+  roles:
+    - mysql
+
+- name: rocky web server install (httpd + wordpress)
+  hosts: web
+  roles:
+    - httpd
+    - wordpress
+
+- name: ubuntu web server install (apache2 + wordpress + dns client)
+  hosts: web1
+  roles:
+    - apache
+    - wordpress
+    - dnsclient
+
+- name: load balancer & dns install (haproxy + bind)
+  hosts: was
+  roles:
+    - haproxy
+    - dns

@@ -1,0 +1,11 @@
+$TTL 1D
+@       IN      SOA     ns.{{ dns_zone }}. admin.{{ dns_zone }}. (
+                        {{ dns_serial }} ; serial
+                        1H              ; refresh
+                        15M             ; retry
+                        1W              ; expire
+                        3H )            ; minimum
+        IN      NS      ns.{{ dns_zone }}.
+{% for r in dns_records %}
+{{ r.name }}   IN      {{ r.type }}      {{ r.value }}
+{% endfor %}

@@ -1,0 +1,9 @@
+---
+apache_packages:
+  - apache2
+  - php
+  - php-mysql
+  - php-gd
+  - libapache2-mod-php
+apache_service: apache2
+apache_port: 80

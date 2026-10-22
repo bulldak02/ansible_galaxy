@@ -1,0 +1,22 @@
+---
+# handlers file for apache
+- name: "started {{ http }}"
+  systemd:
+    name: "{{ http }}"
+    state: started
+
+- name: "restarted {{ http }}"
+  systemd:
+    name: "{{ http }}"
+    state: restarted
+
+- name: "stoped {{ http }}"
+  systemd:
+    name: "{{ http }}"
+    state: stopped
+
+- name: "reload {{ http }}"
+  systemd:
+    name: "{{ http }}"
+    state: reload
+

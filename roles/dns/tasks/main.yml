@@ -1,0 +1,44 @@
+---
+- name: install bind packages
+  ansible.builtin.dnf:
+    name: "{{ dns_packages }}"
+    state: latest
+
+- name: configure named.conf
+  ansible.builtin.template:
+    src: named.conf.j2
+    dest: /etc/named.conf
+    owner: root
+    group: named
+    mode: "0640"
+  notify: restart named
+
+- name: deploy zone file
+  ansible.builtin.template:
+    src: zone.j2
+    dest: "/var/named/{{ dns_zone }}.zone"
+    owner: root
+    group: named
+    mode: "0640"
+  notify: restart named
+
+- name: restore selinux context for zone files
+  ansible.builtin.command:
+    cmd: restorecon -RF /var/named
+  changed_when: false
+
+- name: open dns ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop:
+    - 53/tcp
+    - 53/udp
+
+- name: named service started
+  ansible.builtin.service:
+    name: "{{ dns_service }}"
+    enabled: true
+    state: started
